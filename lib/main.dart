@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -27,7 +28,11 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateMixin {
+
+  final Duration _duration = const Duration(microseconds: 10);
+  late Timer _counterTimer;
+
   final List<Point> _widgets = [
     Point(
       vertical: 10,
@@ -42,14 +47,22 @@ class _MyHomePageState extends State<MyHomePage> {
       horizontal: 1200,
     ),
   ];
+  int count =  100000;
 
   @override
   void initState() {
     super.initState();
+    _counterTimer = Timer.periodic(_duration, (timer) {
+      if(_widgets.length <= count){
+        _fractal();
+      }else{
+        _counterTimer.cancel();
+      }
+    });
   }
 
   void _fractal() {
-    for (int i = 0; i < 10000; i++) {
+    // for (int i = 0; i < 10000; i++) {
       var randVertex = (Random().nextDouble() * 3).floor();
       var randPoint = (Random().nextDouble() * _widgets.length).floor();
 
@@ -65,12 +78,11 @@ class _MyHomePageState extends State<MyHomePage> {
       setState(() {
         _widgets.add(point);
       });
-    }
+    // }
   }
 
   @override
   Widget build(BuildContext context) {
-    _fractal();
     Size size = MediaQuery.of(context).size;
     return Container(
       width: size.width,
@@ -100,8 +112,8 @@ class Point extends StatelessWidget {
       left: horizontal,
       top: vertical,
       child: Container(
-        width: 3,
-        height: 3,
+        width: 2,
+        height: 2,
         decoration: BoxDecoration(
           color: Colors.red,
           borderRadius: BorderRadius.circular(50),
